@@ -73,7 +73,7 @@ export function AddBookModal({ existingIds, onClose, onAdd }: Props) {
           {!loading && !error && results.length > 0 && (
             <>
               {results.some((book) => book.dataSource === 'open-library') && (
-                <p className="fallback-notice" role="status">Google Booksが混み合っているため、代替の書籍データから表示しています。</p>
+                <p className="fallback-notice" role="status">Google Booksと複数の書籍データをまとめて表示しています。</p>
               )}
               <BookSearchResults results={results} existingIds={existingIds} onAdd={onAdd} />
             </>

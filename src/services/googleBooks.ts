@@ -82,48 +82,98 @@ const searchOpenLibrary = async (query: string, mode: BookSearchMode, signal?: A
   })
 }
 
+const mapGoogleBooks = (data: GoogleBooksResponse): BookSearchResult[] => (data.items ?? []).flatMap((item) => {
+  const info = item.volumeInfo
+  if (!item.id || !info?.title) return []
+  const images = info.imageLinks
+  const cover = images?.extraLarge ?? images?.large ?? images?.medium ?? images?.small ?? images?.thumbnail ?? images?.smallThumbnail
+  const identifiers = info.industryIdentifiers ?? []
+  const isbn = identifiers.find((entry) => entry.type === 'ISBN_13')?.identifier
+    ?? identifiers.find((entry) => entry.type === 'ISBN_10')?.identifier
+    ?? ''
+  return [{
+    googleBooksId: item.id,
+    dataSource: 'google-books' as const,
+    title: info.title,
+    authors: info.authors ?? [],
+    publisher: info.publisher ?? '',
+    publishedDate: info.publishedDate ?? '',
+    isbn,
+    coverUrl: secureCoverUrl(cover),
+    description: info.description?.trim() ?? '',
+  }]
+})
+
+const searchGoogle = async (
+  query: string,
+  mode: BookSearchMode,
+  restrictToJapanese: boolean,
+  signal?: AbortSignal,
+): Promise<BookSearchResult[]> => {
+  const endpoint = new URL('https://www.googleapis.com/books/v1/volumes')
+  endpoint.searchParams.set('q', restrictToJapanese || mode === 'isbn' ? buildQuery(query, mode) : query)
+  endpoint.searchParams.set('maxResults', '40')
+  endpoint.searchParams.set('printType', 'books')
+  if (restrictToJapanese) endpoint.searchParams.set('langRestrict', 'ja')
+  const apiKey = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY?.trim()
+  if (apiKey) endpoint.searchParams.set('key', apiKey)
+
+  const response = await fetch(endpoint, { signal, credentials: 'omit', referrerPolicy: 'no-referrer' })
+  if (!response.ok) throw new Error(`Google Books API error: ${response.status}`)
+  return mapGoogleBooks((await response.json()) as GoogleBooksResponse)
+}
+
+const normalizeForMatch = (value: string): string => value.normalize('NFKC').toLocaleLowerCase('ja').replace(/[\s・\-―—_:：/／]/g, '')
+
+const mergeSearchResults = (groups: BookSearchResult[][], query: string): BookSearchResult[] => {
+  const merged = new Map<string, BookSearchResult>()
+  groups.flat().forEach((book) => {
+    const normalizedIsbn = book.isbn.replace(/[^0-9X]/gi, '')
+    const fallbackKey = `${normalizeForMatch(book.title)}:${normalizeForMatch(book.authors[0] ?? '')}`
+    const key = normalizedIsbn.length >= 10 ? `isbn:${normalizedIsbn}` : `book:${fallbackKey}`
+    const existing = merged.get(key)
+    if (!existing) {
+      merged.set(key, book)
+      return
+    }
+    merged.set(key, {
+      ...book,
+      ...existing,
+      coverUrl: existing.coverUrl || book.coverUrl,
+      description: existing.description || book.description,
+    })
+  })
+
+  const normalizedQuery = normalizeForMatch(query)
+  const score = (book: BookSearchResult) => {
+    const title = normalizeForMatch(book.title)
+    const authors = normalizeForMatch(book.authors.join(' '))
+    return (title === normalizedQuery ? 100 : title.includes(normalizedQuery) ? 55 : 0)
+      + (authors.includes(normalizedQuery) ? 35 : 0)
+      + (/[぀-ヿ㐀-鿿]/u.test(book.title) ? 12 : 0)
+      + (book.coverUrl ? 6 : 0)
+      + (book.dataSource === 'google-books' ? 4 : 0)
+  }
+
+  return [...merged.values()].sort((a, b) => score(b) - score(a)).slice(0, 40)
+}
+
 export const searchGoogleBooks = async (
   query: string,
   mode: BookSearchMode = 'all',
   signal?: AbortSignal,
 ): Promise<BookSearchResult[]> => {
-  const endpoint = new URL('https://www.googleapis.com/books/v1/volumes')
-  endpoint.searchParams.set('q', buildQuery(query, mode))
-  endpoint.searchParams.set('maxResults', '24')
-  endpoint.searchParams.set('printType', 'books')
-  endpoint.searchParams.set('langRestrict', 'ja')
   const apiKey = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY?.trim()
-  if (apiKey) endpoint.searchParams.set('key', apiKey)
+  const requests: Array<Promise<BookSearchResult[]>> = [
+    searchGoogle(query, mode, true, signal),
+    searchOpenLibrary(query, mode, signal),
+  ]
+  if (apiKey && mode !== 'isbn') requests.push(searchGoogle(query, mode, false, signal))
 
-  try {
-    const response = await fetch(endpoint, { signal, credentials: 'omit', referrerPolicy: 'no-referrer' })
-    if (!response.ok) return searchOpenLibrary(query, mode, signal)
-
-    const data = (await response.json()) as GoogleBooksResponse
-    const books = (data.items ?? []).flatMap((item) => {
-      const info = item.volumeInfo
-      if (!item.id || !info?.title) return []
-      const images = info.imageLinks
-      const cover = images?.extraLarge ?? images?.large ?? images?.medium ?? images?.small ?? images?.thumbnail ?? images?.smallThumbnail
-      const identifiers = info.industryIdentifiers ?? []
-      const isbn = identifiers.find((entry) => entry.type === 'ISBN_13')?.identifier
-        ?? identifiers.find((entry) => entry.type === 'ISBN_10')?.identifier
-        ?? ''
-      return [{
-        googleBooksId: item.id,
-        dataSource: 'google-books' as const,
-        title: info.title,
-        authors: info.authors ?? [],
-        publisher: info.publisher ?? '',
-        publishedDate: info.publishedDate ?? '',
-        isbn,
-        coverUrl: secureCoverUrl(cover),
-        description: info.description?.trim() ?? '',
-      }]
-    })
-    return books.length > 0 ? enrichBooksWithOpenBd(books, signal) : searchOpenLibrary(query, mode, signal)
-  } catch (error) {
-    if ((error as Error).name === 'AbortError') throw error
-    return searchOpenLibrary(query, mode, signal)
-  }
+  const settled = await Promise.allSettled(requests)
+  if (signal?.aborted) throw new DOMException('Search aborted', 'AbortError')
+  const successfulGroups = settled.flatMap((result) => result.status === 'fulfilled' ? [result.value] : [])
+  if (successfulGroups.length === 0) throw new Error('すべての書籍検索に失敗しました。')
+  const books = mergeSearchResults(successfulGroups, query)
+  return enrichBooksWithOpenBd(books, signal)
 }

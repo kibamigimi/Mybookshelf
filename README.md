@@ -37,6 +37,8 @@ Google Books APIキーは任意です。キーを使用する場合だけ `.env.
 
 GitHub Pagesの標準公開ではAPIキーを組み込まず、匿名検索を使用します。
 
+公開版でGoogle Booksを安定して利用する場合は、リポジトリの **Settings → Secrets and variables → Actions** で `VITE_GOOGLE_BOOKS_API_KEY` というRepository secretを作成してください。Google Cloud ConsoleではBooks APIだけを許可し、HTTPリファラーを `https://kibamigimi.github.io/Mybookshelf/*` に制限します。GitHub Actionsのビルド時にだけこの値を受け取りますが、ブラウザ用キーは生成後のJavaScriptから確認できるため、Google Cloud側の制限設定が必須です。
+
 ## データとプライバシー
 
 本、棚の配置、読了日、評価、感想は利用者自身のブラウザの `localStorage` にのみ保存されます。ログイン、広告、アクセス解析、外部データベースへの読書記録送信はありません。ブラウザのデータを削除すると記録も消え、端末間の同期は行われません。
