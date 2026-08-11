@@ -37,7 +37,7 @@ Google Books APIキーは任意です。キーを使用する場合だけ `.env.
 
 GitHub Pagesの標準公開ではAPIキーを組み込まず、匿名検索を使用します。
 
-公開版でGoogle Booksを安定して利用する場合は、リポジトリの **Settings → Secrets and variables → Actions** で `VITE_GOOGLE_BOOKS_API_KEY` というRepository secretを作成してください。Google Cloud ConsoleではBooks APIだけを許可し、HTTPリファラーを `https://kibamigimi.github.io/Mybookshelf/*` に制限します。GitHub Actionsのビルド時にだけこの値を受け取りますが、ブラウザ用キーは生成後のJavaScriptから確認できるため、Google Cloud側の制限設定が必須です。
+公開版でGoogle Booksを安定して利用する場合は、リポジトリの **Settings → Secrets and variables → Actions** で `VITE_GOOGLE_BOOKS_API_KEY` というRepository secretを作成してください。Google Cloud ConsoleではBooks APIだけを許可し、HTTPリファラーを `https://kibamigimi.github.io/*` に制限します。ブラウザは外部APIへの通信時にパス部分を省略してオリジンだけを送るため、`/Mybookshelf/*` のようなパス単位の制限では正しく認証できません。GitHub Actionsのビルド時にだけこの値を受け取りますが、ブラウザ用キーは生成後のJavaScriptから確認できるため、Google Cloud側の制限設定が必須です。
 
 ## データとプライバシー
 

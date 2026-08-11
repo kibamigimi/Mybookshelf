@@ -118,7 +118,14 @@ const searchGoogle = async (
   const apiKey = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY?.trim()
   if (apiKey) endpoint.searchParams.set('key', apiKey)
 
-  const response = await fetch(endpoint, { signal, credentials: 'omit', referrerPolicy: 'no-referrer' })
+  // Browser-restricted Google API keys are validated against the request's
+  // Referer header. Keep credentials omitted, but allow the browser to send
+  // the HTTPS origin so Google can enforce the configured website restriction.
+  const response = await fetch(endpoint, {
+    signal,
+    credentials: 'omit',
+    referrerPolicy: 'strict-origin-when-cross-origin',
+  })
   if (!response.ok) throw new Error(`Google Books API error: ${response.status}`)
   return mapGoogleBooks((await response.json()) as GoogleBooksResponse)
 }
@@ -175,5 +182,9 @@ export const searchGoogleBooks = async (
   const successfulGroups = settled.flatMap((result) => result.status === 'fulfilled' ? [result.value] : [])
   if (successfulGroups.length === 0) throw new Error('すべての書籍検索に失敗しました。')
   const books = mergeSearchResults(successfulGroups, query)
+  const googleRequests = [settled[0], ...(apiKey && mode !== 'isbn' ? [settled[2]] : [])]
+  if (books.length === 0 && googleRequests.every((result) => result?.status === 'rejected')) {
+    throw new Error('Google Books APIに接続できませんでした。')
+  }
   return enrichBooksWithOpenBd(books, signal)
 }
