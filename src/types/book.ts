@@ -7,6 +7,8 @@ export interface BookSearchResult {
   publishedDate: string
   isbn: string
   coverUrl: string
+  description?: string
+  enrichedByOpenBd?: boolean
 }
 
 export type BookSearchMode = 'all' | 'title' | 'author' | 'isbn'

@@ -66,6 +66,8 @@ export function BookDetailModal({ book, onClose, onSave, onDelete }: Props) {
             <div><dt>出版社</dt><dd>{book.publisher || '—'}</dd></div>
             <div><dt>出版日</dt><dd>{book.publishedDate || '—'}</dd></div>
           </dl>
+          {book.description && <p className="detail-description">{book.description}</p>}
+          {book.enrichedByOpenBd && <span className="openbd-credit">書誌・書影：openBD</span>}
         </div>
       </div>
       {editingCover && (

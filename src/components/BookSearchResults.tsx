@@ -49,6 +49,8 @@ export function BookSearchResults({ results, existingIds, onAdd }: Props) {
               <h3>{book.title}</h3>
               <p className="authors">{book.authors.join('、') || '著者不明'}</p>
               <p className="publication">{[book.publisher, book.publishedDate.slice(0, 4)].filter(Boolean).join(' · ') || '出版情報なし'}</p>
+              {book.description && <p className="result-description">{book.description}</p>}
+              {book.enrichedByOpenBd && <span className="openbd-credit">書誌・書影：openBD</span>}
               {!needsCustomCover && !showCoverEditor && (
                 <button
                   type="button"

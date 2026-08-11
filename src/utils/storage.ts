@@ -30,6 +30,8 @@ export const loadBooks = (): BookshelfBook[] => {
       xPosition: Math.max(0, Math.min(1, book.xPosition)),
       shelfIndex: Math.max(0, Math.min(2, Math.round(book.shelfIndex))),
       coverUrl: normalizeCoverUrl(book.coverUrl ?? ''),
+      description: typeof book.description === 'string' ? book.description : undefined,
+      enrichedByOpenBd: book.enrichedByOpenBd === true || undefined,
     }))
   } catch {
     return []

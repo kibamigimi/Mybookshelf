@@ -27,7 +27,9 @@ export function AddBookRecordModal({ book, onClose, onConfirm }: Props) {
         <div>
           <p className="eyebrow">NEW BOOK</p>
           <h3>{book.title}</h3>
-          <p>{book.authors.join('、') || '著者不明'}</p>
+          <p className="add-record-authors">{book.authors.join('、') || '著者不明'}</p>
+          {book.description && <p className="add-record-description">{book.description}</p>}
+          {book.enrichedByOpenBd && <span className="openbd-credit">書誌・書影：openBD</span>}
         </div>
       </div>
       <div className="notes-form add-record-form">

@@ -1,11 +1,13 @@
 import type { BookSearchMode, BookSearchResult } from '../types/book'
 import { normalizeCoverUrl } from '../utils/url'
+import { enrichBooksWithOpenBd } from './openBd'
 
 interface GoogleVolumeInfo {
   title?: string
   authors?: string[]
   publisher?: string
   publishedDate?: string
+  description?: string
   industryIdentifiers?: Array<{ type?: string; identifier?: string }>
   imageLinks?: Partial<Record<'smallThumbnail' | 'thumbnail' | 'small' | 'medium' | 'large' | 'extraLarge', string>>
 }
@@ -116,9 +118,10 @@ export const searchGoogleBooks = async (
         publishedDate: info.publishedDate ?? '',
         isbn,
         coverUrl: secureCoverUrl(cover),
+        description: info.description?.trim() ?? '',
       }]
     })
-    return books.length > 0 ? books : searchOpenLibrary(query, mode, signal)
+    return books.length > 0 ? enrichBooksWithOpenBd(books, signal) : searchOpenLibrary(query, mode, signal)
   } catch (error) {
     if ((error as Error).name === 'AbortError') throw error
     return searchOpenLibrary(query, mode, signal)
