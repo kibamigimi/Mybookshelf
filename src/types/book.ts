@@ -27,3 +27,9 @@ export interface BookUpdate {
   note?: string
   coverUrl: string
 }
+
+export interface BookRecordInput {
+  readDate?: string
+  rating?: number
+  note?: string
+}

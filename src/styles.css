@@ -201,6 +201,15 @@ main { max-width: 1440px; margin: 0 auto; padding: 28px clamp(12px, 3.7vw, 54px)
 .rating button { border: 0; background: transparent; padding: 3px; color: #c9c0b5; font-size: 24px; cursor: pointer; }
 .rating button.active { color: #d0923c; }
 .rating span { margin-left: 8px; color: #796f65; font-size: 12px; }
+.add-record-book { display: grid; grid-template-columns: 92px 1fr; align-items: center; gap: 22px; padding: 24px 32px; }
+.add-record-cover { width: 92px; height: 132px; display: flex; align-items: center; justify-content: center; }
+.add-record-cover img, .add-record-cover .cover-fallback { width: auto; max-width: 92px; height: auto; max-height: 132px; object-fit: contain; box-shadow: 0 7px 15px rgba(48,31,20,.2); }
+.add-record-book h3 { margin: 0 0 8px; font: 600 21px/1.5 'Noto Serif JP', serif; }
+.add-record-book > div:last-child > p:last-child { margin: 0; color: #71675d; font-size: 12px; }
+.add-record-actions { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 20px 32px 26px; }
+.add-record-actions p { margin: 0; color: #91867b; font-size: 10px; }
+.add-record-actions > div { display: flex; align-items: center; gap: 10px; }
+.add-record-actions .secondary-button { margin: 0; }
 .detail-actions { display: flex; justify-content: space-between; align-items: center; padding: 20px 32px 26px; }
 .delete-button { border: 0; background: none; padding: 8px 0; color: #a54c38; font-size: 12px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
 .delete-confirm { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #8f4331; }
@@ -276,6 +285,12 @@ main { max-width: 1440px; margin: 0 auto; padding: 28px clamp(12px, 3.7vw, 54px)
   .detail-cover-editor { padding: 16px 18px; }
   .notes-form { padding: 20px 18px; grid-template-columns: 1fr; gap: 16px; }
   .notes-form label:last-child { grid-column: auto; }
+  .add-record-book { grid-template-columns: 74px 1fr; gap: 16px; padding: 20px 18px; }
+  .add-record-cover { width: 74px; height: 108px; }
+  .add-record-cover img, .add-record-cover .cover-fallback { max-width: 74px; max-height: 108px; }
+  .add-record-book h3 { font-size: 17px; }
+  .add-record-actions { align-items: stretch; flex-direction: column; padding: 18px; }
+  .add-record-actions > div { justify-content: flex-end; }
   .detail-actions { padding: 18px; gap: 12px; }
   .delete-confirm { flex-wrap: wrap; }
   .manual-form { padding: 20px 16px 26px; }

@@ -26,7 +26,12 @@ export function Modal({ title, onClose, children, wide = false }: ModalProps) {
     }
     document.addEventListener('keydown', onKeyDown)
     document.body.classList.add('modal-open')
-    window.setTimeout(() => panelRef.current?.querySelector<HTMLElement>('input, button, textarea')?.focus(), 30)
+    window.setTimeout(() => {
+      const preferred = panelRef.current?.querySelector<HTMLElement>('[autofocus]')
+      const fallback = panelRef.current?.querySelector<HTMLElement>('input, textarea, button')
+      const target = preferred ?? fallback
+      target?.focus()
+    }, 30)
     return () => {
       document.removeEventListener('keydown', onKeyDown)
       document.body.classList.remove('modal-open')

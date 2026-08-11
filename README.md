@@ -2,6 +2,8 @@
 
 読んだ本の表紙を検索し、木製の本棚へ自由に配置できる個人用Webアプリです。読了日をカレンダーで確認し、評価や感想を読書記録として一覧できます。
 
+**公開アプリ:** https://kibamigimi.github.io/Mybookshelf/
+
 ## 主な機能
 
 - Google Books / Open Libraryからの書籍検索

@@ -1,11 +1,12 @@
 import { useCallback, useMemo, useState } from 'react'
 import { AddBookModal } from './components/AddBookModal'
+import { AddBookRecordModal } from './components/AddBookRecordModal'
 import { BookDetailModal } from './components/BookDetailModal'
 import { ReadingCalendar } from './components/ReadingCalendar'
 import { ReadingList } from './components/ReadingList'
 import { Bookshelf } from './components/Bookshelf'
 import { useBookshelf } from './hooks/useBookshelf'
-import type { BookSearchResult, BookshelfBook } from './types/book'
+import type { BookRecordInput, BookSearchResult, BookshelfBook } from './types/book'
 
 type View = 'bookshelf' | 'calendar' | 'records'
 
@@ -14,17 +15,25 @@ export default function App() {
   const [showAdd, setShowAdd] = useState(false)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [newestId, setNewestId] = useState<string | null>(null)
+  const [pendingBook, setPendingBook] = useState<BookSearchResult | null>(null)
   const [view, setView] = useState<View>('bookshelf')
   const selected = books.find((book) => book.id === selectedId) ?? null
   const existingIds = useMemo(() => new Set(books.map((book) => book.googleBooksId)), [books])
   const closeAdd = useCallback(() => setShowAdd(false), [])
   const closeDetail = useCallback(() => setSelectedId(null), [])
 
-  const handleAdd = (result: BookSearchResult) => {
-    const book = addBook(result)
-    if (!book) return
-    setNewestId(book.id)
+  const prepareAdd = (result: BookSearchResult) => {
     setShowAdd(false)
+    setPendingBook(result)
+  }
+
+  const handleAdd = (record: BookRecordInput) => {
+    if (!pendingBook) return
+    const book = addBook(pendingBook, record)
+    if (!book) return
+    setPendingBook(null)
+    setNewestId(book.id)
+    setView('bookshelf')
     window.setTimeout(() => setNewestId(null), 700)
   }
 
@@ -54,7 +63,8 @@ export default function App() {
         {view === 'records' && <ReadingList books={books} onSelect={handleSelect} />}
       </main>
 
-      {showAdd && <AddBookModal existingIds={existingIds} onClose={closeAdd} onAdd={handleAdd} />}
+      {showAdd && <AddBookModal existingIds={existingIds} onClose={closeAdd} onAdd={prepareAdd} />}
+      {pendingBook && <AddBookRecordModal book={pendingBook} onClose={() => setPendingBook(null)} onConfirm={handleAdd} />}
       {selected && (
         <BookDetailModal
           book={selected}

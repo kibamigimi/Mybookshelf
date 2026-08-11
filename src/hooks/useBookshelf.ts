@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import type { BookSearchResult, BookshelfBook, BookUpdate } from '../types/book'
+import type { BookRecordInput, BookSearchResult, BookshelfBook, BookUpdate } from '../types/book'
 import { loadBooks, saveBooks } from '../utils/storage'
 
 const getAutoPosition = (books: BookshelfBook[]): Pick<BookshelfBook, 'shelfIndex' | 'xPosition'> => {
@@ -13,13 +13,14 @@ export const useBookshelf = () => {
 
   useEffect(() => saveBooks(books), [books])
 
-  const addBook = useCallback((result: BookSearchResult): BookshelfBook | null => {
+  const addBook = useCallback((result: BookSearchResult, record: BookRecordInput = {}): BookshelfBook | null => {
     if (books.some((book) => book.googleBooksId === result.googleBooksId)) return null
     const added: BookshelfBook = {
       ...result,
       id: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`,
       ...getAutoPosition(books),
       addedAt: new Date().toISOString(),
+      ...record,
     }
     setBooks((current) => current.some((book) => book.googleBooksId === result.googleBooksId)
       ? current
