@@ -17,6 +17,7 @@ export default function App() {
   const [newestId, setNewestId] = useState<string | null>(null)
   const [pendingBook, setPendingBook] = useState<BookSearchResult | null>(null)
   const [view, setView] = useState<View>('bookshelf')
+  const [activeBookcase, setActiveBookcase] = useState(0)
   const selected = books.find((book) => book.id === selectedId) ?? null
   const existingIds = useMemo(() => new Set(books.map((book) => book.googleBooksId)), [books])
   const closeAdd = useCallback(() => setShowAdd(false), [])
@@ -29,7 +30,7 @@ export default function App() {
 
   const handleAdd = (record: BookRecordInput) => {
     if (!pendingBook) return
-    const book = addBook(pendingBook, record)
+    const book = addBook(pendingBook, record, activeBookcase)
     if (!book) return
     setPendingBook(null)
     setNewestId(book.id)
@@ -58,7 +59,16 @@ export default function App() {
       </header>
 
       <main id="top" className={`view-main view-${view}`}>
-        {view === 'bookshelf' && <Bookshelf books={books} newestId={newestId} onMove={moveBook} onSelect={handleSelect} />}
+        {view === 'bookshelf' && (
+          <Bookshelf
+            books={books}
+            activeBookcase={activeBookcase}
+            newestId={newestId}
+            onBookcaseChange={setActiveBookcase}
+            onMove={moveBook}
+            onSelect={handleSelect}
+          />
+        )}
         {view === 'calendar' && <ReadingCalendar books={books} onSelect={handleSelect} />}
         {view === 'records' && <ReadingList books={books} onSelect={handleSelect} />}
       </main>

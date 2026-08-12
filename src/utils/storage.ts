@@ -27,6 +27,9 @@ export const loadBooks = (): BookshelfBook[] => {
     if (!Array.isArray(parsed)) return []
     return parsed.filter(isBook).map((book) => ({
       ...book,
+      bookcaseIndex: typeof book.bookcaseIndex === 'number'
+        ? Math.max(0, Math.min(2, Math.round(book.bookcaseIndex)))
+        : 0,
       xPosition: Math.max(0, Math.min(1, book.xPosition)),
       shelfIndex: Math.max(0, Math.min(2, Math.round(book.shelfIndex))),
       coverUrl: normalizeCoverUrl(book.coverUrl ?? ''),

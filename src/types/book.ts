@@ -15,6 +15,7 @@ export type BookSearchMode = 'all' | 'title' | 'author' | 'isbn'
 
 export interface BookshelfBook extends BookSearchResult {
   id: string
+  bookcaseIndex: number
   shelfIndex: number
   xPosition: number
   addedAt: string
