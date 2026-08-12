@@ -15,9 +15,9 @@
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body { margin: 0; min-width: 320px; min-height: 100vh; background: #f2eee6; }
-button, input, textarea { font: inherit; }
+button, input, textarea, select { font: inherit; }
 button { color: inherit; }
-button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid rgba(181, 87, 55, .3); outline-offset: 2px; }
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 3px solid rgba(181, 87, 55, .3); outline-offset: 2px; }
 .modal-open { overflow: hidden; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
 
@@ -35,6 +35,8 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px
 .main-nav button.active::after { transform: scaleX(1); }
 .header-actions { justify-self: end; display: flex; align-items: center; gap: 12px; }
 .icon-button { border: 0; background: transparent; cursor: pointer; display: grid; place-items: center; }
+.settings-button { width: 36px; height: 36px; border-radius: 50%; color: #776c62; font-size: 17px; }
+.settings-button:hover { background: rgba(105,82,63,.08); color: var(--accent); }
 .search-icon-button { width: 43px; height: 43px; border: 1px solid rgba(68,54,43,.16); border-radius: 50%; font: 30px Georgia, serif; transform: rotate(-18deg); padding-bottom: 5px; }
 .primary-button { border: 0; border-radius: 4px; background: var(--accent); color: #fffaf5; padding: 12px 20px; min-height: 43px; font-weight: 600; cursor: pointer; transition: background .22s ease, transform .22s ease, box-shadow .22s ease; }
 .primary-button:hover { background: var(--accent-dark); transform: translateY(-1px); box-shadow: 0 5px 15px rgba(119, 55, 35, .16); }
@@ -215,7 +217,8 @@ main { max-width: 1440px; margin: 0 auto; padding: 28px clamp(12px, 3.7vw, 54px)
 .detail-bibliography .detail-description { margin: 15px 0 0; max-height: 68px; overflow: auto; color: #7c7167; font-size: 10px; line-height: 1.65; }
 .notes-form { padding: 24px 32px; border-top: 1px solid #dfd7cc; border-bottom: 1px solid #dfd7cc; background: #f0ebe3; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 .notes-form label, .notes-form legend { color: #6e645b; font-size: 11px; font-weight: 600; letter-spacing: .05em; }
-.notes-form input, .notes-form textarea { display: block; width: 100%; margin-top: 8px; padding: 11px 12px; border: 1px solid #ccc2b6; border-radius: 4px; background: #fff; color: var(--ink); }
+.notes-form input, .notes-form textarea, .notes-form select { display: block; width: 100%; margin-top: 8px; padding: 11px 12px; border: 1px solid #ccc2b6; border-radius: 4px; background: #fff; color: var(--ink); }
+.location-fields { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding-bottom: 18px; border-bottom: 1px solid #d5cabe; }
 .notes-form label:last-child { grid-column: 1 / -1; position: relative; }
 .notes-form textarea { min-height: 88px; resize: vertical; line-height: 1.6; }
 .notes-form label small { position: absolute; right: 9px; bottom: 7px; color: #aaa096; font-weight: 400; }
@@ -240,6 +243,27 @@ main { max-width: 1440px; margin: 0 auto; padding: 28px clamp(12px, 3.7vw, 54px)
 .delete-confirm button { border: 1px solid #c6b9ad; border-radius: 3px; background: transparent; padding: 5px 8px; cursor: pointer; }
 .delete-confirm button:first-of-type { border-color: #a54c38; color: #a54c38; }
 
+.settings-section { padding: 25px 30px; }
+.settings-section + .settings-section { border-top: 1px solid #ddd4c9; }
+.settings-section-heading h3 { margin: 0 0 5px; font: 600 17px 'Noto Serif JP', serif; }
+.settings-section-heading p { margin: 0; color: #8a7f74; font-size: 10px; line-height: 1.6; }
+.bookcase-name-fields { display: grid; gap: 12px; margin-top: 18px; }
+.bookcase-name-fields label { color: #73685e; font-size: 10px; font-weight: 600; }
+.bookcase-name-fields input { display: block; width: 100%; margin-top: 6px; padding: 10px 11px; border: 1px solid #ccc2b6; border-radius: 4px; background: #fff; color: var(--ink); }
+.settings-save-button { margin-top: 15px; }
+.backup-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 18px; }
+.backup-actions .secondary-button { margin: 0; }
+.backup-privacy { margin: 12px 0 0; padding: 10px 12px; border-radius: 4px; background: #eee6db; color: #796d62; font-size: 9px; line-height: 1.6; }
+.backup-message { margin: 12px 0 0; font-size: 10px; }
+.backup-message.error { color: #a44731; }
+.restore-preview { display: flex; flex-direction: column; align-items: flex-start; gap: 7px; margin-top: 13px; padding: 14px; border: 1px solid #cfc4b7; border-radius: 5px; background: #faf8f3; }
+.restore-preview strong { font: 600 12px 'Noto Serif JP', serif; }
+.restore-preview > span { color: #81766b; font-size: 9px; }
+.restore-preview > .secondary-button { margin: 4px 0 0; }
+.restore-confirm p { margin: 5px 0 10px; color: #8f4331; font-size: 10px; line-height: 1.55; }
+.restore-confirm > div { display: flex; align-items: center; gap: 14px; }
+.settings-footer { display: flex; justify-content: flex-end; padding: 18px 30px 24px; border-top: 1px solid #ddd4c9; }
+
 @media (max-width: 860px) {
   .site-header { gap: 18px; padding-inline: 24px; }
   .main-nav { gap: 18px; }
@@ -258,6 +282,7 @@ main { max-width: 1440px; margin: 0 auto; padding: 28px clamp(12px, 3.7vw, 54px)
   .brand { font-size: 18px; gap: 9px; }
   .brand-mark { transform: scale(.85); transform-origin: left center; margin-right: -3px; }
   .search-icon-button { display: none; }
+  .settings-button { width: 32px; height: 32px; }
   .header-add { padding: 10px 14px; }
   .main-nav { grid-column: 1 / -1; grid-row: 2; justify-content: center; gap: 34px; border-top: 1px solid rgba(68,54,43,.08); }
   .main-nav button { font-size: 11px; }
@@ -312,6 +337,7 @@ main { max-width: 1440px; margin: 0 auto; padding: 28px clamp(12px, 3.7vw, 54px)
   .detail-bibliography dl { font-size: 10px; }
   .detail-cover-editor { padding: 16px 18px; }
   .notes-form { padding: 20px 18px; grid-template-columns: 1fr; gap: 16px; }
+  .location-fields { grid-template-columns: 1fr; gap: 14px; }
   .notes-form label:last-child { grid-column: auto; }
   .add-record-book { grid-template-columns: 74px 1fr; gap: 16px; padding: 20px 18px; }
   .add-record-cover { width: 74px; height: 108px; }
@@ -329,6 +355,10 @@ main { max-width: 1440px; margin: 0 auto; padding: 28px clamp(12px, 3.7vw, 54px)
   .manual-fields .field-wide { grid-column: auto; }
   .manual-actions { align-items: stretch; flex-direction: column; }
   .manual-actions .primary-button { width: 100%; }
+  .settings-section { padding: 21px 18px; }
+  .backup-actions { flex-direction: column; }
+  .backup-actions .secondary-button { width: 100%; }
+  .settings-footer { padding: 16px 18px 22px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

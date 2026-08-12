@@ -1,9 +1,10 @@
 import { useMemo } from 'react'
-import type { BookshelfBook } from '../types/book'
+import type { BookcaseNames, BookshelfBook } from '../types/book'
 import { CoverImage } from './CoverImage'
 
 interface Props {
   books: BookshelfBook[]
+  bookcaseNames: BookcaseNames
   onSelect: (book: BookshelfBook) => void
 }
 
@@ -13,7 +14,7 @@ const formatReadDate = (value?: string) => {
   return `${year}年${Number(month)}月${Number(day)}日`
 }
 
-export function ReadingList({ books, onSelect }: Props) {
+export function ReadingList({ books, bookcaseNames, onSelect }: Props) {
   const groupedBooks = useMemo(() => [0, 1, 2].map((bookcaseIndex) => ({
     bookcaseIndex,
     shelves: [0, 1, 2].map((shelfIndex) => ({
@@ -42,7 +43,7 @@ export function ReadingList({ books, onSelect }: Props) {
             return (
               <section className="record-bookcase" key={bookcaseIndex} aria-labelledby={`bookcase-${bookcaseIndex}-title`}>
                 <div className="record-bookcase-heading">
-                  <h2 id={`bookcase-${bookcaseIndex}-title`}>本棚 {bookcaseIndex + 1}</h2>
+                  <h2 id={`bookcase-${bookcaseIndex}-title`}>{bookcaseNames[bookcaseIndex]}</h2>
                   <span>{bookcaseCount}冊</span>
                 </div>
                 {bookcaseCount === 0 ? <p className="record-bookcase-empty">この本棚にはまだ本がありません。</p> : (

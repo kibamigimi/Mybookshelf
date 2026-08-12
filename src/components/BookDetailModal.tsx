@@ -1,20 +1,23 @@
 import { useEffect, useState } from 'react'
-import type { BookshelfBook, BookUpdate } from '../types/book'
+import type { BookcaseNames, BookshelfBook, BookUpdate } from '../types/book'
 import { CoverImage } from './CoverImage'
 import { Modal } from './Modal'
 import { normalizeCoverUrl } from '../utils/url'
 
 interface Props {
   book: BookshelfBook
+  bookcaseNames: BookcaseNames
   onClose: () => void
   onSave: (update: BookUpdate) => void
   onDelete: () => void
 }
 
-export function BookDetailModal({ book, onClose, onSave, onDelete }: Props) {
+export function BookDetailModal({ book, bookcaseNames, onClose, onSave, onDelete }: Props) {
   const [readDate, setReadDate] = useState(book.readDate ?? '')
   const [rating, setRating] = useState(book.rating)
   const [note, setNote] = useState(book.note ?? '')
+  const [bookcaseIndex, setBookcaseIndex] = useState(book.bookcaseIndex)
+  const [shelfIndex, setShelfIndex] = useState(book.shelfIndex)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [editingCover, setEditingCover] = useState(false)
   const [coverUrl, setCoverUrl] = useState(book.coverUrl)
@@ -23,6 +26,8 @@ export function BookDetailModal({ book, onClose, onSave, onDelete }: Props) {
     setReadDate(book.readDate ?? '')
     setRating(book.rating)
     setNote(book.note ?? '')
+    setBookcaseIndex(book.bookcaseIndex)
+    setShelfIndex(book.shelfIndex)
     setConfirmingDelete(false)
     setEditingCover(false)
     setCoverUrl(book.coverUrl)
@@ -37,7 +42,14 @@ export function BookDetailModal({ book, onClose, onSave, onDelete }: Props) {
 
   const save = () => {
     if (!coverCanSave) return
-    onSave({ readDate: readDate || undefined, rating, note: note.trim() || undefined, coverUrl: editingCover ? normalizedCoverUrl : book.coverUrl })
+    onSave({
+      readDate: readDate || undefined,
+      rating,
+      note: note.trim() || undefined,
+      coverUrl: editingCover ? normalizedCoverUrl : book.coverUrl,
+      bookcaseIndex,
+      shelfIndex,
+    })
     onClose()
   }
 
@@ -96,6 +108,18 @@ export function BookDetailModal({ book, onClose, onSave, onDelete }: Props) {
         </div>
       )}
       <div className="notes-form">
+        <div className="location-fields">
+          <label>置く本棚
+            <select value={bookcaseIndex} onChange={(event) => setBookcaseIndex(Number(event.target.value))}>
+              {bookcaseNames.map((name, index) => <option key={index} value={index}>{name}</option>)}
+            </select>
+          </label>
+          <label>棚の段
+            <select value={shelfIndex} onChange={(event) => setShelfIndex(Number(event.target.value))}>
+              {[0, 1, 2].map((index) => <option key={index} value={index}>{index + 1}段目</option>)}
+            </select>
+          </label>
+        </div>
         <label>読了日<input type="date" value={readDate} onChange={(e) => setReadDate(e.target.value)} /></label>
         <fieldset>
           <legend>評価</legend>

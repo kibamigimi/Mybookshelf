@@ -29,10 +29,21 @@ export interface BookUpdate {
   rating?: number
   note?: string
   coverUrl: string
+  bookcaseIndex: number
+  shelfIndex: number
 }
 
 export interface BookRecordInput {
   readDate?: string
   rating?: number
   note?: string
+}
+
+export type BookcaseNames = [string, string, string]
+
+export interface BookshelfBackup {
+  version: 1
+  exportedAt: string
+  bookcaseNames: BookcaseNames
+  books: BookshelfBook[]
 }

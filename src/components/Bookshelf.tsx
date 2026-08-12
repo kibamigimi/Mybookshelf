@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type PointerEvent } from 'react'
-import type { BookshelfBook } from '../types/book'
+import type { BookcaseNames, BookshelfBook } from '../types/book'
 import { BookItem } from './BookItem'
 
 interface DragState {
@@ -14,6 +14,7 @@ interface DragState {
 
 interface Props {
   books: BookshelfBook[]
+  bookcaseNames: BookcaseNames
   activeBookcase: number
   newestId: string | null
   onBookcaseChange: (index: number) => void
@@ -23,7 +24,7 @@ interface Props {
 
 const clamp = (value: number, min = 0, max = 1) => Math.max(min, Math.min(max, value))
 
-export function Bookshelf({ books, activeBookcase, newestId, onBookcaseChange, onMove, onSelect }: Props) {
+export function Bookshelf({ books, bookcaseNames, activeBookcase, newestId, onBookcaseChange, onMove, onSelect }: Props) {
   const boardRef = useRef<HTMLDivElement>(null)
   const [drag, setDrag] = useState<DragState | null>(null)
   const [dragEdge, setDragEdge] = useState<'left' | 'right' | null>(null)
@@ -129,9 +130,9 @@ export function Bookshelf({ books, activeBookcase, newestId, onBookcaseChange, o
       </div>
       <div className="bookcase-position" aria-live="polite">
         {[0, 1, 2].map((index) => (
-          <button key={index} type="button" className={index === activeBookcase ? 'active' : ''} onClick={() => onBookcaseChange(index)} aria-label={`本棚${index + 1}を表示`} aria-current={index === activeBookcase ? 'true' : undefined} />
+          <button key={index} type="button" className={index === activeBookcase ? 'active' : ''} onClick={() => onBookcaseChange(index)} aria-label={`${bookcaseNames[index]}を表示`} aria-current={index === activeBookcase ? 'true' : undefined} />
         ))}
-        <span>本棚 {activeBookcase + 1} / 3</span>
+        <span>{bookcaseNames[activeBookcase]} · {activeBookcase + 1} / 3</span>
       </div>
     </section>
   )

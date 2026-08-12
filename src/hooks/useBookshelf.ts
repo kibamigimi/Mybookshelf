@@ -42,12 +42,19 @@ export const useBookshelf = () => {
   }, [])
 
   const updateBook = useCallback((id: string, update: BookUpdate) => {
-    setBooks((current) => current.map((book) => book.id === id ? { ...book, ...update } : book))
+    setBooks((current) => current.map((book) => book.id === id ? {
+      ...book,
+      ...update,
+      bookcaseIndex: Math.max(0, Math.min(2, update.bookcaseIndex)),
+      shelfIndex: Math.max(0, Math.min(2, update.shelfIndex)),
+    } : book))
   }, [])
 
   const removeBook = useCallback((id: string) => {
     setBooks((current) => current.filter((book) => book.id !== id))
   }, [])
 
-  return { books, addBook, moveBook, updateBook, removeBook }
+  const replaceBooks = useCallback((nextBooks: BookshelfBook[]) => setBooks(nextBooks), [])
+
+  return { books, addBook, moveBook, updateBook, removeBook, replaceBooks }
 }
