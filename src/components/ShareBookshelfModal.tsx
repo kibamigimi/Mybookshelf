@@ -10,7 +10,6 @@ interface Props {
 }
 
 export function ShareBookshelfModal({ books, bookcaseNames, onClose }: Props) {
-  const nativeShare = Reflect.get(navigator, 'share') as ((data: ShareData) => Promise<void>) | undefined
   const [link, setLink] = useState('')
   const [status, setStatus] = useState<'idle' | 'creating' | 'ready' | 'copied' | 'error'>('idle')
   const [error, setError] = useState('')
@@ -38,38 +37,26 @@ export function ShareBookshelfModal({ books, bookcaseNames, onClose }: Props) {
     }
   }
 
-  const share = async () => {
-    if (!nativeShare) return copy()
-    try {
-      await nativeShare.call(navigator, { title: 'My Bookshelf', text: '私の本棚を見てください。', url: link })
-    } catch (reason) {
-      if (reason instanceof DOMException && reason.name === 'AbortError') return
-      setError('共有画面を開けませんでした。リンクをコピーして共有してください。')
-      setStatus('error')
-    }
-  }
-
   return (
     <Modal title="本棚を共有" onClose={onClose}>
       <div className="share-modal-content">
         <div className="share-intro">
           <span className="share-icon" aria-hidden="true">↗</span>
-          <div><h3>SNSで本棚を見せる</h3><p>3つの本棚を、閲覧専用のリンクとして共有できます。</p></div>
+          <div><h3>本棚のリンクを作る</h3><p>3つの本棚を、閲覧専用のリンクとして共有できます。</p></div>
         </div>
         <div className="share-summary">
           <span>共有される内容</span>
           <strong>{books.length}冊・本棚名・タイトル・著者・表紙・配置</strong>
           <p>読了日、評価、感想、ISBN、出版社は共有されません。</p>
         </div>
-        <p className="share-privacy">リンクを知っている人は本棚を閲覧できます。リンクはSNS投稿の公開範囲に合わせて扱ってください。共有リンクを開いても、相手の本棚データは変更されません。</p>
+        <p className="share-privacy">リンクを知っている人は本棚を閲覧できます。リンクを貼る場所の公開範囲に注意してください。共有リンクを開いても、相手の本棚データは変更されません。</p>
         {!link ? (
           <button type="button" className="primary-button share-create-button" onClick={create} disabled={status === 'creating' || books.length === 0}>{status === 'creating' ? 'リンクを作成中…' : '共有リンクを作成'}</button>
         ) : (
           <div className="share-link-result" role="status">
             <label>共有リンク<input value={link} readOnly onFocus={(event) => event.currentTarget.select()} /></label>
             <div className="share-link-actions">
-              <button type="button" className="secondary-button" onClick={copy}>{status === 'copied' ? '✓ コピーしました' : 'リンクをコピー'}</button>
-              <button type="button" className="primary-button" onClick={share}>{nativeShare ? 'SNSなどで共有' : 'リンクをコピー'}</button>
+              <button type="button" className="primary-button" onClick={copy}>{status === 'copied' ? '✓ コピーしました' : 'リンクをコピー'}</button>
             </div>
           </div>
         )}
