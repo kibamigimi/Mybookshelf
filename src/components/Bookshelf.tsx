@@ -17,6 +17,8 @@ interface Props {
   bookcaseNames: BookcaseNames
   activeBookcase: number
   newestId: string | null
+  readOnly?: boolean
+  ariaLabel?: string
   onBookcaseChange: (index: number) => void
   onMove: (id: string, bookcaseIndex: number, shelfIndex: number, xPosition: number) => void
   onSelect: (book: BookshelfBook) => void
@@ -24,7 +26,7 @@ interface Props {
 
 const clamp = (value: number, min = 0, max = 1) => Math.max(min, Math.min(max, value))
 
-export function Bookshelf({ books, bookcaseNames, activeBookcase, newestId, onBookcaseChange, onMove, onSelect }: Props) {
+export function Bookshelf({ books, bookcaseNames, activeBookcase, newestId, readOnly = false, ariaLabel = '自分の本棚', onBookcaseChange, onMove, onSelect }: Props) {
   const boardRef = useRef<HTMLDivElement>(null)
   const [drag, setDrag] = useState<DragState | null>(null)
   const [dragEdge, setDragEdge] = useState<'left' | 'right' | null>(null)
@@ -108,6 +110,7 @@ export function Bookshelf({ books, bookcaseNames, activeBookcase, newestId, onBo
   }, [books, onBookcaseChange, onMove, onSelect])
 
   const beginDrag = (event: PointerEvent<HTMLButtonElement>, book: BookshelfBook) => {
+    if (readOnly) return
     if (event.button !== 0) return
     event.preventDefault()
     event.currentTarget.setPointerCapture?.(event.pointerId)
@@ -115,7 +118,7 @@ export function Bookshelf({ books, bookcaseNames, activeBookcase, newestId, onBo
   }
 
   return (
-    <section className="bookshelf-section" aria-label="自分の本棚">
+    <section className="bookshelf-section" aria-label={ariaLabel}>
       <div className="bookcase-stage">
         <button type="button" className={`bookcase-arrow bookcase-arrow-left${dragEdge === 'left' ? ' drag-target' : ''}`} onClick={() => onBookcaseChange(activeBookcase - 1)} disabled={activeBookcase === 0} aria-label="左の本棚へ">‹</button>
         <div className="bookcase" ref={boardRef}>
@@ -123,7 +126,7 @@ export function Bookshelf({ books, bookcaseNames, activeBookcase, newestId, onBo
           {[0, 1, 2].map((index) => <div className="shelf-rail" key={index} style={{ top: `${(index + 1) * (100 / 3) - 3}%` }} />)}
           {books.filter((book) => book.bookcaseIndex === activeBookcase || book.id === drag?.id).map((book) => {
             const active = drag?.id === book.id
-            return <BookItem key={book.id} book={book} shelfIndex={active ? drag.shelfIndex : book.shelfIndex} xPosition={active ? drag.xPosition : book.xPosition} dragging={active} isNew={book.id === newestId} onPointerDown={beginDrag} />
+            return <BookItem key={book.id} book={book} shelfIndex={active ? drag.shelfIndex : book.shelfIndex} xPosition={active ? drag.xPosition : book.xPosition} dragging={active} isNew={book.id === newestId} readOnly={readOnly} onPointerDown={beginDrag} />
           })}
         </div>
         <button type="button" className={`bookcase-arrow bookcase-arrow-right${dragEdge === 'right' ? ' drag-target' : ''}`} onClick={() => onBookcaseChange(activeBookcase + 1)} disabled={activeBookcase === 2} aria-label="右の本棚へ">›</button>

@@ -47,3 +47,8 @@ export interface BookshelfBackup {
   bookcaseNames: BookcaseNames
   books: BookshelfBook[]
 }
+
+export interface SharedBookshelf {
+  bookcaseNames: BookcaseNames
+  books: BookshelfBook[]
+}
